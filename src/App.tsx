@@ -75,6 +75,9 @@ type FormulaNode =
       left: FormulaNode;
       right: FormulaNode;
     };
+    
+type BinaryNode = Extract<FormulaNode, { type: "BINARY" }>;
+
 
 let idCounter = 0;
 function genId(): string {
@@ -238,49 +241,71 @@ function evalNode(node: FormulaNode, asg: Assignment): boolean {
 }
 
 // Canonical ASCII pretty-printer for grammaticality checking
+// Canonical ASCII pretty-printer for grammaticality checking
 function formulaToAscii(node: FormulaNode): string {
-  switch (node.type) {
-    case "VAR":
-      return node.name;
-    case "UNARY":
-      return `~${formulaToAscii(node.child)}`;
-    case "BINARY": {
-      const opStr =
-        node.op === "AND"
-          ? "&"
-          : node.op === "OR"
-          ? "v"
-          : node.op === "IMP"
-          ? "->"
-          : "<->";
-      return `(${formulaToAscii(node.left)} ${opStr} ${formulaToAscii(
-        node.right
-      )})`;
-    }
+  if (node.type === "VAR") {
+    return node.name;
   }
+
+  if (node.type === "UNARY") {
+    return `~${formulaToAscii(node.child)}`;
+  }
+
+  // From here on, it's a binary node; cast to make TS happy
+  const b = node as BinaryNode;
+  let opStr: string;
+  switch (b.op) {
+    case "AND":
+      opStr = "&";
+      break;
+    case "OR":
+      opStr = "v";
+      break;
+    case "IMP":
+      opStr = "->";
+      break;
+    case "BICOND":
+      opStr = "<->";
+      break;
+    default:
+      opStr = "?";
+  }
+  return `(${formulaToAscii(b.left)} ${opStr} ${formulaToAscii(b.right)})`;
 }
 
 // Unicode pretty-printer for display
+// Unicode pretty-printer for display
 function formulaToUnicode(node: FormulaNode): string {
-  switch (node.type) {
-    case "VAR":
-      return node.name;
-    case "UNARY":
-      return `¬${formulaToUnicode(node.child)}`;
-    case "BINARY": {
-      const opStr =
-        node.op === "AND"
-          ? "∧"
-          : node.op === "OR"
-          ? "∨"
-          : node.op === "IMP"
-          ? "→"
-          : "↔";
-      return `(${formulaToUnicode(node.left)} ${opStr} ${formulaToUnicode(
-        node.right
-      )})`;
-    }
+  if (node.type === "VAR") {
+    return node.name;
   }
+
+  if (node.type === "UNARY") {
+    return `¬${formulaToUnicode(node.child)}`;
+  }
+
+  const b = node as BinaryNode;
+  let opStr: string;
+  switch (b.op) {
+    case "AND":
+      opStr = "∧";
+      break;
+    case "OR":
+      opStr = "∨";
+      break;
+    case "IMP":
+      opStr = "→";
+      break;
+    case "BICOND":
+      opStr = "↔";
+      break;
+    default:
+      opStr = "?";
+  }
+
+  return `(${formulaToUnicode(b.left)} ${opStr} ${formulaToUnicode(
+    b.right
+  )})`;
 }
 
 /**
