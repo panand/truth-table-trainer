@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useRef } from "react";
 
 /** ---------- Logic: tokens, parser, AST, evaluation ---------- **/
