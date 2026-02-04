@@ -1276,6 +1276,7 @@ ${escapedLog}
                                 border: "1px solid #e5e7eb",
                                 padding: "0.2rem 0.45rem",
                                 textAlign: "center",
+                                color: "red",
                                 backgroundColor: relevantAtomIndices.has(
                                   atomIdx
                                 )
@@ -1315,6 +1316,7 @@ ${escapedLog}
                                   textAlign: "center",
                                   cursor: interactive ? "pointer" : "default",
                                   backgroundColor: bg,
+                                  color: "blue",
                                   userSelect: "none",
                                 }}
                                 onClick={() =>
